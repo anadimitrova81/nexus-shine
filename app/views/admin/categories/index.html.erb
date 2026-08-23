@@ -1,0 +1,32 @@
+<% content_for :title, "Категории" %>
+<div class="admin-head">
+  <h1>Категории</h1>
+  <%= link_to "+ Нова категория", new_admin_category_path, class: "btn btn-primary" %>
+</div>
+
+<% if @categories.any? %>
+  <div class="table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr><th>Име</th><th>Slug</th><th class="num">Продукти</th><th class="num">Позиция</th><th class="actions">Действия</th></tr>
+      </thead>
+      <tbody>
+        <% @categories.each do |category| %>
+          <tr>
+            <td><%= link_to category.name, edit_admin_category_path(category), class: "row-link" %></td>
+            <td><code><%= category.slug %></code></td>
+            <td class="num"><%= category.products.count %></td>
+            <td class="num"><%= category.position %></td>
+            <td class="actions">
+              <%= link_to "Редактирай", edit_admin_category_path(category), class: "mini-link" %>
+              <%= link_to "Изтрий", admin_category_path(category), class: "mini-link danger",
+                    data: { turbo_method: :delete, turbo_confirm: "Изтриване на „#{category.name}“?" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="empty-note">Все още няма категории.</p>
+<% end %>

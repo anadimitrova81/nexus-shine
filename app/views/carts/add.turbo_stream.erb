@@ -1,0 +1,4 @@
+<%# Updates the header cart badge in place after an async add-to-cart. %>
+<%= turbo_stream.replace "cart-badge" do %>
+  <span class="cart-badge" id="cart-badge" data-count="<%= current_cart.item_count %>"><%= current_cart.item_count %></span>
+<% end %>

@@ -1,0 +1,78 @@
+<% content_for :title, "Поръчка ##{@order.id}" %>
+
+<div class="container order-confirmation">
+  <div class="order-confirm-icon" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+  </div>
+  <h1>Благодарим за поръчката!</h1>
+  <p class="order-confirm-lead">Поръчка <strong>#<%= @order.id %></strong> е приета.
+    Ще се свържем с вас на <strong><%= @order.phone %></strong> за потвърждение.</p>
+
+  <% if @order.card_payment? %>
+    <% if @order.paid? %>
+      <p class="pay-status pay-status-paid">✓ Плащането с карта е получено.</p>
+    <% else %>
+      <p class="pay-status pay-status-pending">Очаква плащане с карта.</p>
+      <%= link_to "Плати сега", pay_order_path(@order), class: "btn btn-primary" %>
+    <% end %>
+  <% elsif @order.bank_transfer? %>
+    <p class="pay-status pay-status-pending">Плащане по банков път — изпратихме проформа фактура с данните за превода на имейла ви.</p>
+    <%= link_to "Проформа фактура (PDF)", proforma_order_path(@order), class: "btn btn-secondary", target: "_blank", rel: "noopener" %>
+  <% else %>
+    <p class="pay-status pay-status-pending">Плащане при доставка (наложен платеж).</p>
+  <% end %>
+
+  <div class="order-card">
+    <h2>Детайли</h2>
+    <table class="order-table">
+      <tbody>
+        <% @order.order_items.each do |item| %>
+          <tr>
+            <td><%= item.product_name %> <span class="muted">× <%= item.quantity %></span></td>
+            <td class="right"><%= item.subtotal.eur_formatted %></td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Продукти</td>
+          <td class="right"><%= @order.subtotal.eur_formatted %></td>
+        </tr>
+        <% if @order.shipping_cents.to_i.positive? %>
+          <tr>
+            <td>Доставка (Speedy)</td>
+            <td class="right"><%= @order.shipping.eur_formatted %></td>
+          </tr>
+        <% end %>
+        <tr>
+          <td><strong>Общо</strong></td>
+          <td class="right"><strong><%= @order.grand_total.eur_formatted %></strong></td>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="order-shipping">
+      <h3>Доставка</h3>
+      <% if @order.shipping_method == "office" %>
+        <p>До офис на Speedy: <strong><%= @order.shipping_label.presence || @order.shipping_city %></strong></p>
+      <% elsif @order.shipping_method == "address" %>
+        <p>До адрес в <strong><%= @order.shipping_city.presence || @order.city %></strong></p>
+      <% end %>
+      <p><%= @order.customer_name %><br>
+        <%= @order.address %>, <%= @order.city %> <%= @order.postal_code %><br>
+        <%= @order.email %></p>
+    </div>
+    <% if @order.wants_invoice? %>
+      <div class="order-shipping">
+        <h3>Фактура</h3>
+        <p>
+          <strong><%= @order.invoice_company %></strong><br>
+          ЕИК: <%= @order.invoice_eik %><%= " · ДДС: #{@order.invoice_vat}" if @order.invoice_vat.present? %><br>
+          <%= @order.invoice_address %>
+          <%= " · МОЛ: #{@order.invoice_mol}" if @order.invoice_mol.present? %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+
+  <%= link_to "Обратно към магазина", shop_path, class: "btn btn-primary" %>
+</div>

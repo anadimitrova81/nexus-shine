@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="bg">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Пренасочване към myPOS…</title>
+    <style>
+      body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; background: #f5f8fa; color: #12303f;
+             display: grid; place-items: center; min-height: 100vh; margin: 0; }
+      .box { text-align: center; }
+      .spinner { width: 42px; height: 42px; margin: 0 auto 16px; border: 4px solid #d7e6ec;
+                 border-top-color: #22a3a4; border-radius: 50%; animation: spin 0.9s linear infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .btn { display: inline-block; margin-top: 14px; background: #22a3a4; color: #fff; padding: 12px 22px;
+             border-radius: 10px; border: 0; font: inherit; font-weight: 700; cursor: pointer; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Пренасочваме ви към сигурната страница на myPOS за плащане…</p>
+      <%= form_tag @purchase.action_url, method: :post, id: "mypos-form", authenticity_token: false do %>
+        <% @purchase.params.each do |name, value| %>
+          <%= hidden_field_tag name, value, id: nil %>
+        <% end %>
+        <noscript><button type="submit" class="btn">Продължи към плащане</button></noscript>
+      <% end %>
+    </div>
+    <script>document.getElementById("mypos-form").submit();</script>
+  </body>
+</html>

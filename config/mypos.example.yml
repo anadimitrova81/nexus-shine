@@ -1,0 +1,28 @@
+# myPOS Checkout credentials — REAL integration.
+#
+# HOW TO USE:
+#   1. Copy this file to `config/mypos.yml` (same folder).
+#   2. Open config/mypos.yml in any text editor and fill in your values from
+#      the myPOS account (Online payments → your store → Keys / Certificates).
+#   3. Set MYPOS_LOCAL_SANDBOX=0 (or remove it) and restart the server.
+#
+# config/mypos.yml is git-ignored, so your keys stay off version control.
+# Keep the pipe "|" blocks and indentation exactly as shown for the multi-line
+# key and certificate.
+
+sid: "your-store-id"
+wallet_number: "your-wallet-number"
+key_index: 1
+
+# Use the TEST endpoint until verified; switch to https://mypos.com/vmp/checkout for live.
+ipc_url: "https://mypos.com/vmp/checkout-test"
+
+private_key: |
+  -----BEGIN RSA PRIVATE KEY-----
+  ...paste your merchant private key here...
+  -----END RSA PRIVATE KEY-----
+
+public_cert: |
+  -----BEGIN CERTIFICATE-----
+  ...paste the myPOS public certificate here...
+  -----END CERTIFICATE-----

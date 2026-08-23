@@ -1,0 +1,141 @@
+<% content_for :title, "Табло" %>
+<div class="admin-head"><h1>Табло</h1></div>
+
+<% period_labels = { "today" => "Днес", "7d" => "7 дни", "30d" => "30 дни",
+                     "month" => "Този месец", "year" => "Тази година", "all" => "Всичко" } %>
+
+<div class="report-filter">
+  <div class="filter-tabs">
+    <% period_labels.each do |key, label| %>
+      <%= link_to label, admin_root_path(period: key), class: "filter-tab #{'is-active' if @period == key}" %>
+    <% end %>
+  </div>
+  <%= form_with url: admin_root_path, method: :get, class: "date-range" do %>
+    <%= hidden_field_tag :period, "custom" %>
+    <%= date_field_tag :from, @from&.iso8601, "aria-label": "От дата" %>
+    <span>–</span>
+    <%= date_field_tag :to, @to&.iso8601, "aria-label": "До дата" %>
+    <%= submit_tag "Приложи", class: "btn btn-secondary btn-sm" %>
+  <% end %>
+</div>
+
+<p class="report-range">
+  <% if @range %>
+    Период: <strong><%= @from.strftime("%d.%m.%Y") %> – <%= @to.strftime("%d.%m.%Y") %></strong>
+  <% else %>
+    Период: <strong>цялата история</strong>
+  <% end %>
+</p>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">Приходи</div>
+    <div class="stat-value"><%= @revenue.eur_formatted %></div>
+    <div class="stat-sub">за периода · без отказани</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Поръчки</div>
+    <div class="stat-value"><%= @orders_count %></div>
+    <div class="stat-sub"><%= @pending_count %> нови за обработка</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Средна поръчка</div>
+    <div class="stat-value"><%= @avg_order.eur_formatted %></div>
+    <div class="stat-sub"><%= pluralize_bg(@billable_count, "платена поръчка", "платени поръчки") %></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Продукти</div>
+    <div class="stat-value"><%= @active_products %></div>
+    <div class="stat-sub">
+      от <%= @products_count %>
+      <% if @low_stock_count.positive? %>· <strong style="color:#92600a;"><%= @low_stock_count %> с ниска наличност</strong><% end %>
+    </div>
+  </div>
+</div>
+
+<% if @low_stock_count.positive? %>
+  <div class="admin-panel low-stock-panel">
+    <h2>⚠ Ниска наличност (<%= @low_stock_count %>)</h2>
+    <table class="admin-table">
+      <thead><tr><th>Продукт</th><th class="num">Наличност</th><th class="num">Праг</th><th class="actions"></th></tr></thead>
+      <tbody>
+        <% @low_stock_products.each do |product| %>
+          <tr>
+            <td><%= product.name %></td>
+            <td class="num">
+              <% if product.stock_quantity <= 0 %>
+                <span class="status-badge status-cancelled">Изчерпан</span>
+              <% else %>
+                <span class="status-badge pay-pending"><%= product.stock_quantity %> бр.</span>
+              <% end %>
+            </td>
+            <td class="num"><%= product.low_stock_threshold %></td>
+            <td class="actions"><%= link_to "Обнови", edit_admin_product_path(product), class: "mini-link" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<div class="admin-cols">
+  <div class="admin-panel">
+    <h2>Поръчки по статус</h2>
+    <table class="admin-table">
+      <tbody>
+        <% Order::STATUSES.each do |status| %>
+          <tr>
+            <td><%= order_status_badge(status) %></td>
+            <td class="num"><%= @status_counts[status] || 0 %></td>
+            <td class="actions"><%= link_to "Виж", admin_orders_path(status: status), class: "mini-link" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="admin-panel">
+    <h2>Най-продавани продукти</h2>
+    <% if @top_products.any? %>
+      <table class="admin-table">
+        <thead><tr><th>Продукт</th><th class="num">Бройки</th><th class="num">Приход</th></tr></thead>
+        <tbody>
+          <% @top_products.each do |name, qty, revenue_cents| %>
+            <tr>
+              <td><%= name %></td>
+              <td class="num"><%= qty %></td>
+              <td class="num"><%= Money.new(revenue_cents).eur_formatted %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="empty-note">Няма продажби за периода.</p>
+    <% end %>
+  </div>
+</div>
+
+<div class="admin-panel">
+  <h2>Последни поръчки</h2>
+  <% if @recent_orders.any? %>
+    <div class="table-scroll">
+      <table class="admin-table">
+        <thead><tr><th>#</th><th>Клиент</th><th class="num">Общо</th><th>Статус</th><th>Дата</th><th class="actions"></th></tr></thead>
+        <tbody>
+          <% @recent_orders.each do |order| %>
+            <tr>
+              <td><%= link_to "##{order.id}", admin_order_path(order), class: "row-link" %></td>
+              <td><%= order.customer_name %></td>
+              <td class="num"><%= order.total.eur_formatted %></td>
+              <td><%= order_status_badge(order.status) %></td>
+              <td><%= order.created_at.strftime("%d.%m.%Y %H:%M") %></td>
+              <td class="actions"><%= link_to "Отвори", admin_order_path(order), class: "mini-link" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="empty-note">Още няма поръчки.</p>
+  <% end %>
+</div>

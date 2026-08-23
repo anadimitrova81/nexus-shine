@@ -1,0 +1,94 @@
+<% content_for :title, @product.name %>
+<% content_for :description, @product.short_description %>
+
+<div class="container">
+  <nav class="breadcrumb" aria-label="Навигация">
+    <%= link_to "Начало", root_path %> <span>/</span>
+    <%= link_to "Продукти", shop_path %> <span>/</span>
+    <%= @product.name %>
+  </nav>
+</div>
+
+<div class="container product-detail">
+  <div class="product-detail-media">
+    <% if (src = product_image_source(@product)) %>
+      <%= image_tag src, alt: @product.name, class: "product-detail-photo" %>
+    <% elsif @product.image.attached? %>
+      <%= image_tag @product.image, alt: @product.name %>
+    <% else %>
+      <span class="product-detail-placeholder" aria-hidden="true"><%= @product.brand&.name&.first || "N" %></span>
+    <% end %>
+  </div>
+
+  <div class="product-detail-info">
+    <% if @product.brand %><span class="product-card-brand"><%= @product.brand.name %></span><% end %>
+    <h1><%= @product.name %></h1>
+    <% if @product.size.present? %><p class="product-detail-size">Разфасовка: <strong><%= @product.size %></strong></p><% end %>
+
+    <div class="product-detail-price">
+      <span class="price-eur"><%= @product.price.eur_formatted %></span>
+    </div>
+
+    <% if @product.short_description.present? %>
+      <p class="product-detail-lead"><%= @product.short_description %></p>
+    <% end %>
+
+    <% if @product.in_stock? %>
+      <% if @product.low_stock? %>
+        <p class="stock-note">Още само <%= @product.stock_quantity %> бр. в наличност</p>
+      <% end %>
+      <%= form_with url: cart_add_path(product_id: @product.id), method: :post, class: "product-detail-buy",
+            data: { controller: "quantity" } do %>
+        <div class="qty-field">
+          <button type="button" class="qty-btn" data-action="quantity#decrement" aria-label="По-малко">−</button>
+          <%= number_field_tag :quantity, 1, min: 1, max: [@product.stock_quantity, 99].min, class: "qty-input", data: { quantity_target: "input" } %>
+          <button type="button" class="qty-btn" data-action="quantity#increment" aria-label="Повече">+</button>
+        </div>
+        <%= submit_tag "Добави в количката", class: "btn btn-primary btn-lg" %>
+      <% end %>
+    <% else %>
+      <p class="stock-note stock-note-out">Изчерпан</p>
+      <span class="btn btn-lg btn-disabled">Няма наличност</span>
+    <% end %>
+
+    <div class="product-detail-meta">
+      <% @product.categories.each do |c| %>
+        <%= link_to c.name, shop_path(category: c.slug), class: "tag" %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% if @product.description.present? %>
+  <div class="container product-description">
+    <h2>Описание</h2>
+    <%= formatted_description @product.description %>
+  </div>
+<% end %>
+
+<% if @product.specs.present? %>
+  <div class="container product-specs">
+    <h2>Допълнителна информация</h2>
+    <table class="specs-table">
+      <tbody>
+        <% @product.specs.each do |label, value| %>
+          <tr>
+            <th scope="row"><%= label %></th>
+            <td><%= value %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<% if @related.any? %>
+  <section class="home-section home-section-alt">
+    <div class="container">
+      <h2 class="section-heading">Подобни продукти</h2>
+      <div class="product-grid">
+        <%= render @related %>
+      </div>
+    </div>
+  </section>
+<% end %>

@@ -1,0 +1,34 @@
+<%# Product card used on the home page and shop grid. %>
+<article class="product-card">
+  <%= link_to product_path(product), class: "product-card-media" do %>
+    <% if (src = product_image_source(product)) %>
+      <%= image_tag src, alt: product.name, loading: "lazy", class: "product-card-photo" %>
+    <% elsif product.image.attached? %>
+      <%= image_tag product.image, alt: product.name, loading: "lazy" %>
+    <% else %>
+      <span class="product-card-placeholder" aria-hidden="true"><%= product.brand&.name&.first || "N" %></span>
+    <% end %>
+    <% if !product.in_stock? %>
+      <span class="product-badge product-badge-out">Изчерпан</span>
+    <% elsif product.low_stock? %>
+      <span class="product-badge product-badge-low">Ниска наличност</span>
+    <% elsif product.best_seller? %>
+      <span class="product-badge">Хит</span>
+    <% end %>
+  <% end %>
+  <div class="product-card-body">
+    <% if product.brand %><span class="product-card-brand"><%= product.brand.name %></span><% end %>
+    <h3 class="product-card-title"><%= link_to product.name, product_path(product) %></h3>
+    <% if product.size.present? %><span class="product-card-size"><%= product.size %></span><% end %>
+    <div class="product-card-price">
+      <span class="price-eur"><%= product.price.eur_formatted %></span>
+    </div>
+    <% if product.in_stock? %>
+      <%= button_to cart_add_path(product_id: product.id), class: "btn btn-primary btn-block", form_class: "product-card-form" do %>
+        Добави в количката
+      <% end %>
+    <% else %>
+      <span class="btn btn-block btn-disabled">Изчерпан</span>
+    <% end %>
+  </div>
+</article>

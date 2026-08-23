@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="bg">
+  <head>
+    <title><%= content_for(:title) ? "#{content_for(:title)} · Админ" : "Nexus Shine · Админ" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <%= stylesheet_link_tag "application", "admin", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="admin">
+    <% if session[:admin_authenticated] %>
+      <div class="admin-shell">
+        <aside class="admin-sidebar">
+          <div class="admin-brand">
+            <%= image_tag "nexus-shine-logo.png", alt: "Nexus Shine", class: "admin-brand-img" %>
+            <span>Админ</span>
+          </div>
+          <nav class="admin-nav">
+            <%= link_to "Табло", admin_root_path, class: admin_nav_class("dashboard") %>
+            <%= link_to "Поръчки", admin_orders_path, class: admin_nav_class("orders") %>
+            <%= link_to admin_products_path, class: admin_nav_class("products") do %>
+              Продукти<% if admin_low_stock_count.positive? %> <span class="nav-badge" title="Продукти с ниска наличност"><%= admin_low_stock_count %></span><% end %>
+            <% end %>
+            <%= link_to "Категории", admin_categories_path, class: admin_nav_class("categories") %>
+            <%= link_to "Марки", admin_brands_path, class: admin_nav_class("brands") %>
+          </nav>
+          <div class="admin-sidebar-foot">
+            <%= link_to "↗ Виж сайта", root_path, class: "admin-nav-link" %>
+            <%= button_to "Изход", admin_logout_path, method: :delete, class: "admin-logout" %>
+          </div>
+        </aside>
+
+        <main class="admin-main">
+          <% if notice.present? %><div class="flash flash-notice admin-flash"><span><%= notice %></span></div><% end %>
+          <% if alert.present? %><div class="flash flash-alert admin-flash"><span><%= alert %></span></div><% end %>
+          <%= yield %>
+        </main>
+      </div>
+    <% else %>
+      <div class="admin-auth">
+        <% if notice.present? %><div class="flash flash-notice admin-flash"><span><%= notice %></span></div><% end %>
+        <% if alert.present? %><div class="flash flash-alert admin-flash"><span><%= alert %></span></div><% end %>
+        <%= yield %>
+      </div>
+    <% end %>
+  </body>
+</html>

@@ -1,0 +1,69 @@
+<% content_for :title, "За нас" %>
+
+<div class="page-head">
+  <div class="container">
+    <h1>За Nexus Shine</h1>
+    <p class="page-head-lead">Вашият надежден партньор в България за висококачествени
+      почистващи продукти и автомобилна химия.</p>
+  </div>
+</div>
+
+<div class="container prose">
+  <p>В <strong>Nexus Shine</strong> вярваме, че качеството започва с доверени партньори.
+    Затова работим само с производители с доказан опит и иновации в своите продукти.
+    Нашата мисия е да предоставим надеждни решения за почистване и поддръжка, които
+    съчетават качество, безопасност и ефективност за автомобили, домове и офиси.</p>
+</div>
+
+<section class="home-section home-section-alt">
+  <div class="container">
+    <h2 class="section-heading">Официални партньори</h2>
+    <div class="brand-grid">
+      <% @brands.each do |brand| %>
+        <div class="brand-card">
+          <div class="brand-card-logo">
+            <% if (logo = brand_logo_tag(brand, class: "brand-logo-img")) %>
+              <%= logo %>
+            <% else %>
+              <h3><%= brand.name %></h3>
+            <% end %>
+          </div>
+          <p><%= brand.description %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<section class="home-section">
+  <div class="container">
+    <h2 class="section-heading">Какво казват клиентите</h2>
+    <div class="testimonial-grid">
+      <% [
+           ["Васил Иванов", "Оценявам концентрацията на шампоана ERA и това, че е безопасен за деликатни материи."],
+           ["Симо Василев", "Като авто-детайлър използвам Turbopax ежедневно — почиства безкомпромисно."],
+           ["Мария Симеонова", "В пералнята за килими Turbopax и ERA се справят и с най-упоритите петна."],
+           ["Нели Андреева", "Спреят Power 1 е универсален — ползвам го за всичко вкъщи."],
+           ["Стоян Мавродиев", "Собственик съм на автомивка на самообслужване — Turbopax е надежден и икономичен."],
+         ].each do |name, quote| %>
+        <figure class="testimonial">
+          <blockquote>„<%= quote %>“</blockquote>
+          <figcaption><%= name %></figcaption>
+        </figure>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="container cta-band-inner">
+    <div>
+      <h2>Готови сте да поръчате?</h2>
+      <p>Разгледайте пълната гама или се свържете с нас за консултация.</p>
+    </div>
+    <div class="cta-band-actions">
+      <%= link_to "Към продуктите", shop_path, class: "btn btn-primary btn-lg" %>
+      <%= link_to "Свържете се", contact_path, class: "btn btn-ghost btn-lg" %>
+    </div>
+  </div>
+</section>

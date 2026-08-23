@@ -1,0 +1,53 @@
+<% content_for :title, @active_category&.name || "Продукти" %>
+
+<div class="page-head">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Навигация">
+      <%= link_to "Начало", root_path %> <span>/</span>
+      <%= link_to "Продукти", shop_path %>
+      <% if @active_category %><span>/</span> <%= @active_category.name %><% end %>
+    </nav>
+    <h1><%= @active_category&.name || "Всички продукти" %></h1>
+    <% if @active_category&.description.present? %>
+      <p class="page-head-lead"><%= @active_category.description %></p>
+    <% end %>
+  </div>
+</div>
+
+<div class="container shop-layout">
+  <aside class="shop-sidebar">
+    <h2 class="sidebar-heading">Категории</h2>
+    <ul class="category-filter">
+      <li><%= link_to "Всички продукти", shop_path(sort: @sort), class: ("is-active" unless @active_category) %></li>
+      <% @categories.each do |category| %>
+        <li>
+          <%= link_to shop_path(category: category.slug, sort: @sort),
+                class: ("is-active" if @active_category == category) do %>
+            <%= category.name %> <span class="count"><%= category.products.active.count %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </aside>
+
+  <div class="shop-main">
+    <div class="shop-toolbar">
+      <span class="shop-count"><%= pluralize_bg(@products.size, "продукт", "продукта") %></span>
+      <%= form_with url: shop_path, method: :get, class: "shop-sort" do %>
+        <%= hidden_field_tag :category, params[:category] if @active_category %>
+        <label for="sort">Подреди:</label>
+        <%= select_tag :sort,
+              options_for_select(sort_options, @sort),
+              onchange: "this.form.requestSubmit()", id: "sort" %>
+      <% end %>
+    </div>
+
+    <% if @products.any? %>
+      <div class="product-grid">
+        <%= render @products %>
+      </div>
+    <% else %>
+      <p class="empty-state">Няма продукти в тази категория.</p>
+    <% end %>
+  </div>
+</div>

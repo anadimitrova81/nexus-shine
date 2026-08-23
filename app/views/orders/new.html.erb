@@ -1,0 +1,198 @@
+<% content_for :title, "Поръчка" %>
+
+<div class="page-head">
+  <div class="container"><h1>Завършване на поръчката</h1></div>
+</div>
+
+<div class="container checkout-layout">
+  <div class="checkout-form">
+    <%= form_with model: @order, url: orders_path do |f| %>
+      <% if flash.now[:alert].present? || @order.errors.any? %>
+        <div class="form-errors">
+          <% if flash.now[:alert].present? %><p><%= flash.now[:alert] %></p><% end %>
+          <% if @order.errors.any? %>
+            <ul><% @order.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
+          <% end %>
+        </div>
+      <% end %>
+
+      <h2>Данни за контакт</h2>
+      <div class="field">
+        <%= f.label :customer_name, "Име и фамилия" %>
+        <%= f.text_field :customer_name, required: true %>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <%= f.label :email, "Имейл" %>
+          <%= f.email_field :email, required: true %>
+        </div>
+        <div class="field">
+          <%= f.label :phone, "Телефон" %>
+          <%= f.telephone_field :phone, required: true %>
+        </div>
+      </div>
+
+      <% if shipping_available? %>
+        <h2>Доставка (Speedy)</h2>
+        <div class="shipping-box"
+             data-controller="shipping"
+             data-shipping-sites-url-value="<%= shipping_sites_path %>"
+             data-shipping-offices-url-value="<%= shipping_offices_path %>"
+             data-shipping-quote-url-value="<%= shipping_quote_path %>"
+             data-shipping-subtotal-cents-value="<%= current_cart.total_cents %>">
+
+          <div class="pay-methods">
+            <label class="pay-method">
+              <input type="radio" name="ship_ui" value="office" checked data-action="shipping#methodChanged">
+              <span class="pay-method-body"><strong>До офис на Speedy</strong><small>Вземане от офис — по-евтино</small></span>
+            </label>
+            <label class="pay-method">
+              <input type="radio" name="ship_ui" value="address" data-action="shipping#methodChanged">
+              <span class="pay-method-body"><strong>До адрес</strong><small>Доставка до врата</small></span>
+            </label>
+          </div>
+
+          <div class="field ship-autocomplete">
+            <%= label_tag nil, "Населено място" %>
+            <input type="text" autocomplete="off" placeholder="Започнете да пишете, напр. Пловдив…"
+                   data-shipping-target="cityQuery" data-action="input->shipping#cityInput keydown->shipping#cityKeydown">
+            <ul class="ship-suggest" data-shipping-target="suggestions" hidden></ul>
+          </div>
+
+          <div class="field" data-shipping-target="officeField" hidden>
+            <%= label_tag nil, "Офис на Speedy" %>
+            <select class="ship-select" data-shipping-target="officeSelect" data-action="shipping#officeChanged">
+              <option value="">Първо изберете населено място</option>
+            </select>
+          </div>
+
+          <div class="field-row" data-shipping-target="addressFields" hidden>
+            <div class="field">
+              <%= label_tag nil, "Адрес (улица, №)" %>
+              <input type="text" data-shipping-target="street" data-action="input->shipping#syncAddress">
+            </div>
+            <div class="field">
+              <%= label_tag nil, "Пощенски код" %>
+              <input type="text" data-shipping-target="zip" data-action="input->shipping#syncAddress">
+            </div>
+          </div>
+
+          <p class="ship-result" data-shipping-target="result"></p>
+
+          <%# Hidden order + shipping fields, kept in sync by the controller %>
+          <%= f.hidden_field :city,              data: { shipping_target: "orderCity" } %>
+          <%= f.hidden_field :address,           data: { shipping_target: "orderAddress" } %>
+          <%= f.hidden_field :postal_code,       data: { shipping_target: "orderZip" } %>
+          <%= f.hidden_field :shipping_method,   value: "office", data: { shipping_target: "methodField" } %>
+          <%= f.hidden_field :shipping_site_id,  data: { shipping_target: "siteField" } %>
+          <%= f.hidden_field :shipping_office_id, data: { shipping_target: "officeIdField" } %>
+          <%= f.hidden_field :shipping_city,     data: { shipping_target: "shipCityField" } %>
+          <%= f.hidden_field :shipping_label,    data: { shipping_target: "labelField" } %>
+        </div>
+
+        <div class="field">
+          <%= f.label :note, "Бележка (по избор)" %>
+          <%= f.text_area :note, rows: 2 %>
+        </div>
+      <% else %>
+        <h2>Данни за доставка</h2>
+        <div class="field"><%= f.label :address, "Адрес" %><%= f.text_field :address, required: true %></div>
+        <div class="field-row">
+          <div class="field"><%= f.label :city, "Град" %><%= f.text_field :city, required: true %></div>
+          <div class="field"><%= f.label :postal_code, "Пощенски код" %><%= f.text_field :postal_code %></div>
+        </div>
+        <div class="field"><%= f.label :note, "Бележка (по избор)" %><%= f.text_area :note, rows: 2 %></div>
+      <% end %>
+
+      <h2>Начин на плащане</h2>
+      <div class="pay-methods">
+        <% if mypos_available? %>
+          <label class="pay-method">
+            <%= f.radio_button :payment_method, "card" %>
+            <span class="pay-method-body">
+              <strong>Плащане с карта</strong>
+              <small>Сигурно онлайн плащане чрез myPOS</small>
+            </span>
+          </label>
+        <% end %>
+        <label class="pay-method">
+          <%= f.radio_button :payment_method, "cod" %>
+          <span class="pay-method-body">
+            <strong>При доставка (наложен платеж)</strong>
+            <small>Плащате в брой при получаване на пратката</small>
+          </span>
+        </label>
+        <label class="pay-method">
+          <%= f.radio_button :payment_method, "bank" %>
+          <span class="pay-method-body">
+            <strong>Банков превод</strong>
+            <small>Ще получите данни за плащане по имейл</small>
+          </span>
+        </label>
+      </div>
+
+      <div class="invoice-box" data-controller="invoice" data-invoice-lookup-url-value="/eik_lookups">
+        <label class="check invoice-toggle">
+          <%= f.check_box :wants_invoice, data: { invoice_target: "toggle", action: "invoice#toggle" } %>
+          <strong>Искам фактура</strong>
+        </label>
+        <div class="invoice-fields" data-invoice-target="fields" hidden>
+          <div class="field">
+            <%= f.label :invoice_eik, "ЕИК / Булстат" %>
+            <div class="eik-row">
+              <%= f.text_field :invoice_eik, data: { invoice_target: "eik" }, placeholder: "напр. 131371780" %>
+              <button type="button" class="btn btn-secondary btn-sm" data-action="invoice#lookup" data-invoice-target="lookupBtn">Извлечи</button>
+            </div>
+            <p class="field-hint" data-invoice-target="status">Въведете ЕИК и натиснете „Извлечи“ за автоматично попълване от регистъра.</p>
+          </div>
+          <div class="field">
+            <%= f.label :invoice_company, "Фирма" %>
+            <%= f.text_field :invoice_company, data: { invoice_target: "company" } %>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <%= f.label :invoice_vat, "ДДС №" %>
+              <%= f.text_field :invoice_vat, data: { invoice_target: "vat" } %>
+            </div>
+            <div class="field">
+              <%= f.label :invoice_mol, "МОЛ" %>
+              <%= f.text_field :invoice_mol, data: { invoice_target: "mol" } %>
+            </div>
+          </div>
+          <div class="field">
+            <%= f.label :invoice_address, "Адрес по регистрация" %>
+            <%= f.text_field :invoice_address, data: { invoice_target: "address" } %>
+          </div>
+        </div>
+      </div>
+
+      <%= f.submit "Продължи", class: "btn btn-primary btn-lg btn-block" %>
+      <p class="checkout-note">При плащане с карта ще ви пренасочим към сигурната страница на myPOS.</p>
+    <% end %>
+  </div>
+
+  <aside class="checkout-summary">
+    <h2>Вашата поръчка</h2>
+    <ul class="checkout-lines">
+      <% current_cart.each do |product, quantity| %>
+        <li>
+          <span class="checkout-line-name"><%= product.name %> <em>× <%= quantity %></em></span>
+          <span class="checkout-line-price"><%= Money.new(product.price_cents * quantity).eur_formatted %></span>
+        </li>
+      <% end %>
+    </ul>
+    <div class="cart-summary-row">
+      <span>Продукти</span><span><%= current_cart.total.eur_formatted %></span>
+    </div>
+    <% if shipping_available? %>
+      <div class="cart-summary-row">
+        <span>Доставка (Speedy)</span><span id="ship-amount">—</span>
+      </div>
+    <% end %>
+    <div class="cart-summary-row cart-summary-total">
+      <span>Общо</span>
+      <span><strong id="grand-amount"><%= current_cart.total.eur_formatted %></strong></span>
+    </div>
+    <%= link_to "← Назад към количката", cart_path, class: "checkout-back" %>
+  </aside>
+</div>

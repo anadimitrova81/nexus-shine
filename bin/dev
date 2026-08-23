@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+if !system("gem list foreman -i --silent")
+  puts "Installing foreman..."
+  system("gem install foreman", exception: true)
+end
+
+exec "foreman", "start", "-f", "Procfile.dev", "--env", "/dev/null", *ARGV

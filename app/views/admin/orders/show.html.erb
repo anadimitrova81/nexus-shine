@@ -1,0 +1,94 @@
+<% content_for :title, "Поръчка ##{@order.id}" %>
+<div class="admin-head">
+  <h1>Поръчка #<%= @order.id %> <%= order_status_badge(@order.status) %></h1>
+  <%= link_to "← Всички поръчки", admin_orders_path, class: "btn btn-secondary" %>
+</div>
+
+<div class="order-grid">
+  <div class="admin-panel">
+    <h2>Артикули</h2>
+    <table class="admin-table">
+      <thead><tr><th>Продукт</th><th class="num">Ед. цена</th><th class="num">Бр.</th><th class="num">Сума</th></tr></thead>
+      <tbody>
+        <% @order.order_items.each do |item| %>
+          <tr>
+            <td><%= item.product_name %></td>
+            <td class="num"><%= item.unit_price.eur_formatted %></td>
+            <td class="num"><%= item.quantity %></td>
+            <td class="num"><%= item.subtotal.eur_formatted %></td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr><td colspan="3" class="num">Продукти</td><td class="num"><%= @order.subtotal.eur_formatted %></td></tr>
+        <% if @order.shipping_cents.to_i.positive? %>
+          <tr><td colspan="3" class="num">Доставка (Speedy)</td><td class="num"><%= @order.shipping.eur_formatted %></td></tr>
+        <% end %>
+        <tr><td colspan="3" class="num"><strong>Общо</strong></td><td class="num"><strong><%= @order.grand_total.eur_formatted %></strong></td></tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div>
+    <div class="admin-panel">
+      <h2>Статус и плащане</h2>
+      <p style="margin:0 0 12px;">
+        Плащане: <strong><%= payment_method_label(@order.payment_method) %></strong>
+        <%= payment_status_badge(@order.payment_status) %>
+      </p>
+      <p style="margin:0 0 12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <% if @order.bank_transfer? %>
+          <%= link_to "Проформа фактура (PDF)", proforma_order_path(@order), class: "btn btn-secondary btn-sm", target: "_blank", rel: "noopener" %>
+        <% end %>
+        <% if @order.invoiced? %>
+          <%= link_to "Фактура №#{format('%010d', @order.invoice_number)} (PDF)", invoice_admin_order_path(@order), class: "btn btn-secondary btn-sm", target: "_blank", rel: "noopener" %>
+        <% else %>
+          <%= button_to "Издай фактура", issue_invoice_admin_order_path(@order), method: :post, class: "btn btn-secondary btn-sm",
+                data: { turbo_confirm: "Да се издаде фактура за поръчка ##{@order.id}? Номерът се взима от поредността и не може да се освободи." } %>
+        <% end %>
+      </p>
+      <%= form_with model: [:admin, @order], method: :patch do |f| %>
+        <div class="field">
+          <%= f.label :status, "Статус на поръчката" %>
+          <%= f.select :status, Order::STATUSES.map { |s| [order_status_label(s), s] } %>
+        </div>
+        <div class="field">
+          <%= f.label :payment_status, "Статус на плащането" %>
+          <%= f.select :payment_status, Order::PAYMENT_STATUSES.map { |s| [payment_status_label(s), s] } %>
+        </div>
+        <%= f.submit "Запази", class: "btn btn-primary" %>
+      <% end %>
+    </div>
+
+    <div class="admin-panel">
+      <h2>Клиент</h2>
+      <p>
+        <strong><%= @order.customer_name %></strong><br>
+        <a href="tel:<%= @order.phone %>"><%= @order.phone %></a><br>
+        <a href="mailto:<%= @order.email %>"><%= @order.email %></a>
+      </p>
+      <h2 style="margin-top:16px;">Доставка</h2>
+      <% if @order.shipping_method == "office" %>
+        <p><strong>Speedy офис:</strong> <%= @order.shipping_label.presence || @order.shipping_city %></p>
+      <% elsif @order.shipping_method == "address" %>
+        <p><strong>Speedy до адрес</strong> (<%= @order.shipping_city.presence || @order.city %>)</p>
+      <% end %>
+      <p><%= @order.address %><br><%= @order.city %> <%= @order.postal_code %></p>
+      <% if @order.wants_invoice? %>
+        <h2 style="margin-top:16px;">Фактура</h2>
+        <p>
+          <strong><%= @order.invoice_company %></strong><br>
+          ЕИК: <%= @order.invoice_eik %><br>
+          <% if @order.invoice_vat.present? %>ДДС №: <%= @order.invoice_vat %><br><% end %>
+          <% if @order.invoice_mol.present? %>МОЛ: <%= @order.invoice_mol %><br><% end %>
+          <%= @order.invoice_address %>
+        </p>
+      <% end %>
+      <% if @order.note.present? %>
+        <h2 style="margin-top:16px;">Бележка</h2>
+        <p><%= simple_format @order.note %></p>
+      <% end %>
+      <p class="stat-sub" style="margin-top:14px;">Създадена: <%= @order.created_at.strftime("%d.%m.%Y %H:%M") %></p>
+    </div>
+  </div>
+</div>

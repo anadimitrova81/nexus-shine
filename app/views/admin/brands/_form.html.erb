@@ -1,0 +1,27 @@
+<%= form_with model: [:admin, brand], class: "admin-form" do |f| %>
+  <% if brand.errors.any? %>
+    <div class="form-errors">
+      <p>Моля, поправете грешките:</p>
+      <ul><% brand.errors.full_messages.each do |m| %><li><%= m %></li><% end %></ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name, "Име" %>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :slug, "Slug (за URL)" %>
+    <%= f.text_field :slug %>
+    <p class="field-hint">Латиница, напр. „turbopax“. Оставете празно за автоматичен.</p>
+  </div>
+  <div class="field">
+    <%= f.label :description, "Описание" %>
+    <%= f.text_area :description, rows: 3 %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit "Запази", class: "btn btn-primary" %>
+    <%= link_to "Отказ", admin_brands_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

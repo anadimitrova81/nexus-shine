@@ -1,0 +1,115 @@
+<%= form_with model: [:admin, product], class: "admin-form" do |f| %>
+  <% if product.errors.any? %>
+    <div class="form-errors">
+      <p>Моля, поправете грешките:</p>
+      <ul><% product.errors.full_messages.each do |m| %><li><%= m %></li><% end %></ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name, "Име" %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <%= f.label :slug, "Slug (за URL)" %>
+      <%= f.text_field :slug %>
+      <p class="field-hint">Латиница. Оставете празно за автоматичен.</p>
+    </div>
+    <div class="field">
+      <%= f.label :brand_id, "Марка" %>
+      <%= f.collection_select :brand_id, Brand.ordered, :id, :name, { include_blank: "— без марка —" } %>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <%= f.label :price_eur, "Цена (€)" %>
+      <%= f.number_field :price_eur, step: 0.01, min: 0 %>
+    </div>
+    <div class="field">
+      <%= f.label :size, "Разфасовка" %>
+      <%= f.text_field :size, placeholder: "напр. 20 кг" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= f.label :weight_kg, "Тегло (кг)" %>
+    <%= f.number_field :weight_kg, step: 0.01, min: 0 %>
+    <p class="field-hint">Използва се за калкулация на доставката със Speedy.</p>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <%= f.label :stock_quantity, "Наличност (бр.)" %>
+      <%= f.number_field :stock_quantity, min: 0, step: 1 %>
+    </div>
+    <div class="field">
+      <%= f.label :low_stock_threshold, "Праг за ниска наличност" %>
+      <%= f.number_field :low_stock_threshold, min: 0, step: 1 %>
+      <p class="field-hint">Известие в таблото при наличност ≤ този праг.</p>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= f.label :categories, "Категории" %>
+    <div class="checks">
+      <% Category.ordered.each do |category| %>
+        <label class="check">
+          <%= check_box_tag "product[category_ids][]", category.id,
+                product.category_ids.include?(category.id), id: "cat_#{category.id}" %>
+          <%= category.name %>
+        </label>
+      <% end %>
+    </div>
+    <%= hidden_field_tag "product[category_ids][]", "" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :short_description, "Кратко описание" %>
+    <%= f.text_field :short_description %>
+  </div>
+
+  <div class="field">
+    <%= f.label :description, "Описание" %>
+    <%= f.text_area :description, rows: 6 %>
+    <p class="field-hint">Ред, който завършва с „:“ (напр. „Предимства:“) се показва като акцентирано подзаглавие.</p>
+  </div>
+
+  <div class="field">
+    <%= f.label :specs_text, "Допълнителна информация" %>
+    <%= f.text_area :specs_text, rows: 5 %>
+    <p class="field-hint">По един ред на характеристика във формат <code>Етикет = стойност</code>, напр. <code>Тегло = 20 кг</code>.</p>
+  </div>
+
+  <div class="field">
+    <%= f.label :image, "Снимка" %>
+    <% if product.image.attached? %>
+      <div><%= image_tag product.image, class: "current-image", alt: "" %></div>
+    <% end %>
+    <%= f.file_field :image, accept: "image/*" %>
+    <% if product_image_source(product) %>
+      <p class="field-hint">Този продукт използва вградена снимка от asset-ите. Качена тук снимка ще важи само ако вградената бъде премахната.</p>
+    <% end %>
+  </div>
+
+  <div class="field">
+    <label>Настройки</label>
+    <div class="checks">
+      <label class="check"><%= f.check_box :active %> Активен (видим в магазина)</label>
+      <label class="check"><%= f.check_box :featured %> Избран продукт</label>
+      <label class="check"><%= f.check_box :best_seller %> Най-продаван (Хит)</label>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= f.label :position, "Позиция (подредба)" %>
+    <%= f.number_field :position %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit "Запази", class: "btn btn-primary" %>
+    <%= link_to "Отказ", admin_products_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

@@ -1,0 +1,17 @@
+# Speedy API credentials (https://api.speedy.bg).
+#
+# HOW TO USE:
+#   1. Copy this file to `config/speedy.yml`.
+#   2. Fill in your username and password from your Speedy contract.
+#   3. Restart the server.
+#
+# config/speedy.yml is git-ignored, so your password stays off version control.
+
+username: "your-speedy-username"
+password: "your-speedy-password"
+language: "BG"
+
+# Where parcels are shipped FROM — your dispatch city/site (used for pricing).
+# Set your Speedy sender site id if you have one; otherwise leave blank and the
+# sender is taken from your Speedy account default.
+sender_site_id: ""

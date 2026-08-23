@@ -1,0 +1,37 @@
+<% content_for :title, "Поръчки" %>
+<div class="admin-head"><h1>Поръчки</h1></div>
+
+<div class="filter-tabs">
+  <%= link_to "Всички (#{@counts.values.sum})", admin_orders_path,
+        class: "filter-tab #{'is-active' unless @status}" %>
+  <% Order::STATUSES.each do |status| %>
+    <%= link_to "#{order_status_label(status)} (#{@counts[status] || 0})",
+          admin_orders_path(status: status), class: "filter-tab #{'is-active' if @status == status}" %>
+  <% end %>
+</div>
+
+<% if @orders.any? %>
+  <div class="table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr><th>#</th><th>Клиент</th><th>Контакт</th><th class="num">Общо</th><th>Плащане</th><th>Статус</th><th>Дата</th><th class="actions"></th></tr>
+      </thead>
+      <tbody>
+        <% @orders.each do |order| %>
+          <tr>
+            <td><%= link_to "##{order.id}", admin_order_path(order), class: "row-link" %></td>
+            <td><%= order.customer_name %><div class="stat-sub"><%= order.city %></div></td>
+            <td><%= order.phone %><div class="stat-sub"><%= order.email %></div></td>
+            <td class="num"><%= order.total.eur_formatted %></td>
+            <td><%= payment_status_badge(order.payment_status) %><div class="stat-sub"><%= payment_method_label(order.payment_method) %></div></td>
+            <td><%= order_status_badge(order.status) %></td>
+            <td><%= order.created_at.strftime("%d.%m.%Y %H:%M") %></td>
+            <td class="actions"><%= link_to "Отвори", admin_order_path(order), class: "mini-link" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="empty-note">Няма поръчки<%= " с този статус" if @status %>.</p>
+<% end %>

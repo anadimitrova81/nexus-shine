@@ -1,0 +1,26 @@
+<% content_for :title, "Често задавани въпроси" %>
+
+<div class="page-head">
+  <div class="container"><h1>Често задавани въпроси</h1></div>
+</div>
+
+<div class="container faq-list">
+  <% @faqs.each do |item| %>
+    <details class="faq-item">
+      <summary><%= item[:q] %></summary>
+      <div class="faq-answer"><%= simple_format item[:a] %></div>
+    </details>
+  <% end %>
+</div>
+
+<section class="cta-band">
+  <div class="container cta-band-inner">
+    <div>
+      <h2>Имате друг въпрос?</h2>
+      <p>Свържете се с нас за професионална консултация.</p>
+    </div>
+    <div class="cta-band-actions">
+      <%= link_to "Контакти", contact_path, class: "btn btn-primary btn-lg" %>
+    </div>
+  </div>
+</section>

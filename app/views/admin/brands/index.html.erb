@@ -1,0 +1,31 @@
+<% content_for :title, "Марки" %>
+<div class="admin-head">
+  <h1>Марки</h1>
+  <%= link_to "+ Нова марка", new_admin_brand_path, class: "btn btn-primary" %>
+</div>
+
+<% if @brands.any? %>
+  <div class="table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr><th>Име</th><th>Slug</th><th class="num">Продукти</th><th class="actions">Действия</th></tr>
+      </thead>
+      <tbody>
+        <% @brands.each do |brand| %>
+          <tr>
+            <td><%= link_to brand.name, edit_admin_brand_path(brand), class: "row-link" %></td>
+            <td><code><%= brand.slug %></code></td>
+            <td class="num"><%= brand.products.count %></td>
+            <td class="actions">
+              <%= link_to "Редактирай", edit_admin_brand_path(brand), class: "mini-link" %>
+              <%= link_to "Изтрий", admin_brand_path(brand), class: "mini-link danger",
+                    data: { turbo_method: :delete, turbo_confirm: "Изтриване на „#{brand.name}“?" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="empty-note">Все още няма марки.</p>
+<% end %>

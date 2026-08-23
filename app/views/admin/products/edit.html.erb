@@ -1,0 +1,6 @@
+<% content_for :title, "Редакция на продукт" %>
+<div class="admin-head">
+  <h1>Редакция: <%= @product.name %></h1>
+  <%= link_to "↗ Виж в магазина", product_path(@product), class: "btn btn-secondary", target: "_blank", rel: "noopener" %>
+</div>
+<%= render "form", product: @product %>

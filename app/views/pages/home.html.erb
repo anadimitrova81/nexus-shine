@@ -1,0 +1,119 @@
+<% content_for :title, "Професионална почистваща химия" %>
+
+<section class="hero hero-campaign">
+  <span class="hero-bg" style="background-image:url('<%= asset_path("categories/carwash.jpg") %>')" aria-hidden="true"></span>
+  <span class="hero-overlay" aria-hidden="true"></span>
+
+  <div class="hero-inner hero-campaign-inner">
+    <div class="hero-copy">
+      <span class="hero-ribbon">Официален вносител за България</span>
+      <h1>Професионална химия за&nbsp;блясък и&nbsp;чистота</h1>
+      <p>ERA 111 Professional, TURBOPAX и Power 1 — доказани препарати за
+        самообслужващи се автомивки, перални за килими, дома и индустрията.</p>
+      <div class="hero-actions">
+        <%= link_to "Разгледай продуктите", shop_path, class: "btn btn-primary btn-lg" %>
+        <%= link_to "Научи повече", about_path, class: "btn btn-ghost btn-lg" %>
+      </div>
+      <ul class="hero-usps">
+        <li>✓ Оригинални продукти</li>
+        <li>✓ Доставка 1–3 дни</li>
+        <li>✓ Отстъпки на едро</li>
+      </ul>
+    </div>
+
+    <div class="hero-cluster" aria-hidden="true">
+      <%= image_tag "products/turbopax-polish-gel.png", alt: "", class: "hero-cluster-left" %>
+      <%= image_tag "products/stain-remover.png",       alt: "", class: "hero-cluster-back" %>
+      <%= image_tag "products/carpet-shampoo.png",      alt: "", class: "hero-cluster-front" %>
+    </div>
+  </div>
+</section>
+
+<section class="partners">
+  <div class="partners-bg" aria-hidden="true"></div>
+  <div class="container">
+    <div class="partners-head">
+      <span class="hero-eyebrow partners-eyebrow">Официален вносител за България</span>
+      <h2 class="section-heading">Нашите марки партньори</h2>
+      <p class="partners-sub">Работим само с доказани производители с опит и иновации в професионалната химия.</p>
+    </div>
+    <div class="partners-cards">
+      <% @brands.each do |brand| %>
+        <% next unless (logo = brand_logo_tag(brand, class: "partner-logo-img")) %>
+        <%= link_to about_path, class: "partner-card", title: brand.name do %>
+          <span class="partner-card-glow" aria-hidden="true"></span>
+          <span class="partner-logo-frame"><%= logo %></span>
+          <span class="partner-card-name"><%= brand.name %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<section class="home-section">
+  <div class="container">
+    <div class="section-head-row">
+      <h2 class="section-heading">Категории</h2>
+      <%= link_to "Всички продукти →", shop_path, class: "section-head-link" %>
+    </div>
+    <div class="cat-showcase">
+      <%= link_to shop_path(category: "carwash"), class: "cat-tile",
+            style: "background-image:url('#{asset_path("categories/carwash.jpg")}')" do %>
+        <span class="cat-tile-shade" aria-hidden="true"></span>
+        <span class="cat-tile-body">
+          <span class="cat-tile-kicker">Категория</span>
+          <span class="cat-tile-title">Автомивки</span>
+          <span class="cat-tile-text">Активна пяна, шампоани, вакси и препарати за гуми и джанти.</span>
+          <span class="cat-tile-cta">Разгледай продуктите →</span>
+        </span>
+      <% end %>
+
+      <%= link_to shop_path(category: "carpet-washing"), class: "cat-tile",
+            style: "background-image:url('#{asset_path("categories/carpet-washing.jpg")}')" do %>
+        <span class="cat-tile-shade" aria-hidden="true"></span>
+        <span class="cat-tile-body">
+          <span class="cat-tile-kicker">Категория</span>
+          <span class="cat-tile-title">Пране на килими</span>
+          <span class="cat-tile-text">Шампоани, препарати за петна и парфюми за професионални перални.</span>
+          <span class="cat-tile-cta">Разгледай продуктите →</span>
+        </span>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<% if @featured.any? %>
+  <section class="home-section home-section-alt">
+    <div class="container">
+      <div class="section-head-row">
+        <h2 class="section-heading">Избрани продукти</h2>
+        <%= link_to "Всички →", shop_path, class: "section-head-link" %>
+      </div>
+      <div class="product-grid">
+        <%= render @featured %>
+      </div>
+    </div>
+  </section>
+<% end %>
+
+<section class="promo-band">
+  <div class="container promo-band-inner">
+    <div class="promo-item"><strong>Отстъпки на едро</strong><span>Партньорски цени за автомивки и перални</span></div>
+    <div class="promo-item"><strong>Безплатна доставка</strong><span>За поръчки над 50 €</span></div>
+    <div class="promo-item"><strong>Консултация</strong><span>Помагаме да изберете правилния продукт</span></div>
+  </div>
+</section>
+
+<% if @best_sellers.any? %>
+  <section class="home-section">
+    <div class="container">
+      <div class="section-head-row">
+        <h2 class="section-heading">Най-продавани</h2>
+        <%= link_to "Всички →", shop_path, class: "section-head-link" %>
+      </div>
+      <div class="product-grid">
+        <%= render @best_sellers %>
+      </div>
+    </div>
+  </section>
+<% end %>

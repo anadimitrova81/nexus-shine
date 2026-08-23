@@ -1,0 +1,56 @@
+<% content_for :title, "Продукти" %>
+<div class="admin-head">
+  <h1>Продукти</h1>
+  <%= link_to "+ Нов продукт", new_admin_product_path, class: "btn btn-primary" %>
+</div>
+
+<% if @products.any? %>
+  <div class="table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr><th></th><th>Име</th><th>Марка</th><th>Категории</th><th class="num">Цена</th><th class="num">Наличност</th><th>Статус</th><th class="actions">Действия</th></tr>
+      </thead>
+      <tbody>
+        <% @products.each do |product| %>
+          <tr>
+            <td>
+              <% if (src = product_image_source(product)) %>
+                <%= image_tag src, class: "thumb", alt: "" %>
+              <% elsif product.image.attached? %>
+                <%= image_tag product.image, class: "thumb", alt: "" %>
+              <% end %>
+            </td>
+            <td>
+              <%= link_to product.name, edit_admin_product_path(product), class: "row-link" %>
+              <% if product.size.present? %><div class="stat-sub"><%= product.size %></div><% end %>
+            </td>
+            <td><%= product.brand&.name %></td>
+            <td><%= product.categories.map(&:name).join(", ") %></td>
+            <td class="num"><%= product.price.eur_formatted %></td>
+            <td class="num">
+              <% if product.stock_quantity <= 0 %>
+                <span class="status-badge status-cancelled">Изчерпан</span>
+              <% elsif product.low_stock? %>
+                <span class="status-badge pay-pending"><%= product.stock_quantity %> бр.</span>
+              <% else %>
+                <%= product.stock_quantity %>
+              <% end %>
+            </td>
+            <td>
+              <% unless product.active? %><span class="status-badge status-cancelled">Скрит</span><% end %>
+              <% if product.featured? %><span class="status-badge status-confirmed">Избран</span><% end %>
+              <% if product.best_seller? %><span class="status-badge status-delivered">Хит</span><% end %>
+            </td>
+            <td class="actions">
+              <%= link_to "Редактирай", edit_admin_product_path(product), class: "mini-link" %>
+              <%= link_to "Изтрий", admin_product_path(product), class: "mini-link danger",
+                    data: { turbo_method: :delete, turbo_confirm: "Изтриване на „#{product.name}“?" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="empty-note">Все още няма продукти.</p>
+<% end %>

@@ -1,0 +1,22 @@
+# Company requisites and bank details printed on proforma invoices.
+# These appear on every document sent to clients, so the file is committed.
+shared:
+  seller:
+    name: "Нексус ООД"
+    address: "ул. Дякон Иларион 4 ет.4 ап.4"
+    city: "4000 Пловдив"
+    country: "България"
+    eik: "112641285"
+    mol: "Георги Димитров, Ана Димитрова"
+  issuer: "Ана Димитрова"
+  vat_exemption_note: "чл.113 ал.9 от ЗДДС"
+  bank:
+    name: "Обединена българска банка АД"
+    iban: "BG31UBBS80021071524750"
+    bic: "UBBSBGSF"
+  # Real invoices use the 7000000001+ range (gapless, per ЗДДС). Proformas are
+  # not tax documents, so they get their own informal range that never collides
+  # with the invoices or the accounting software's sequence (50000000xx).
+  invoice_sequence_start: 7000000001
+  proforma_sequence_start: 9000000001
+  email_from: "Nexus Shine <sales@nexus-shine.com>"

@@ -1,0 +1,50 @@
+<% content_for :title, "Контакти" %>
+
+<div class="page-head">
+  <div class="container"><h1>Контакти</h1>
+    <p class="page-head-lead">Пишете ни или се обадете — ще се радваме да помогнем с избора на продукт.</p>
+  </div>
+</div>
+
+<div class="container contact-layout">
+  <div class="contact-details">
+    <h2>Данни за връзка</h2>
+    <ul class="contact-list">
+      <li>
+        <span class="contact-label">Телефон</span>
+        <a href="tel:<%= company[:phone_href] %>"><%= company[:phone_display] %></a>
+      </li>
+      <li>
+        <span class="contact-label">Имейл</span>
+        <a href="mailto:<%= company[:email] %>"><%= company[:email] %></a>
+      </li>
+      <li>
+        <span class="contact-label">Офис имейл</span>
+        <a href="mailto:<%= company[:office_email] %>"><%= company[:office_email] %></a>
+      </li>
+      <li>
+        <span class="contact-label">Адрес</span>
+        <span><%= company[:city] %>, <%= company[:postal_code] %></span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="contact-form-wrap">
+    <h2>Пишете ни</h2>
+    <%= form_with url: contact_path, method: :post, class: "contact-form" do %>
+      <div class="field">
+        <%= label_tag :name, "Име" %>
+        <%= text_field_tag :name, nil, required: true %>
+      </div>
+      <div class="field">
+        <%= label_tag :email, "Имейл" %>
+        <%= email_field_tag :email, nil, required: true %>
+      </div>
+      <div class="field">
+        <%= label_tag :message, "Съобщение" %>
+        <%= text_area_tag :message, nil, rows: 5, required: true %>
+      </div>
+      <%= submit_tag "Изпрати", class: "btn btn-primary btn-lg" %>
+    <% end %>
+  </div>
+</div>

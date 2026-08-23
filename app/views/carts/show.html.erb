@@ -1,0 +1,62 @@
+<% content_for :title, "Количка" %>
+
+<div class="page-head">
+  <div class="container"><h1>Количка</h1></div>
+</div>
+
+<div class="container">
+  <% if current_cart.empty? %>
+    <div class="empty-state cart-empty">
+      <p>Количката ви е празна.</p>
+      <%= link_to "Към продуктите", shop_path, class: "btn btn-primary" %>
+    </div>
+  <% else %>
+    <div class="cart-layout">
+      <div class="cart-items">
+        <% current_cart.each do |product, quantity| %>
+          <div class="cart-item">
+            <%= link_to product_path(product), class: "cart-item-media" do %>
+              <% if (src = product_image_source(product)) %>
+                <%= image_tag src, alt: product.name, class: "cart-item-photo" %>
+              <% elsif product.image.attached? %>
+                <%= image_tag product.image, alt: product.name %>
+              <% else %>
+                <span class="product-card-placeholder" aria-hidden="true"><%= product.brand&.name&.first || "N" %></span>
+              <% end %>
+            <% end %>
+            <div class="cart-item-info">
+              <h3><%= link_to product.name, product_path(product) %></h3>
+              <% if product.size.present? %><span class="product-card-size"><%= product.size %></span><% end %>
+              <span class="cart-item-unit"><%= product.price.eur_formatted %></span>
+            </div>
+            <%= form_with url: cart_update_path(product_id: product.id), method: :patch, class: "cart-item-qty" do %>
+              <%= number_field_tag :quantity, quantity, min: 1, max: 99, class: "qty-input" %>
+              <%= submit_tag "Обнови", class: "btn btn-secondary btn-sm" %>
+            <% end %>
+            <div class="cart-item-subtotal">
+              <%= Money.new(product.price_cents * quantity).eur_formatted %>
+            </div>
+            <%= button_to cart_remove_path(product_id: product.id), method: :delete,
+                  class: "cart-item-remove", "aria-label": "Премахни" do %>✕<% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <aside class="cart-summary">
+        <h2>Обобщение</h2>
+        <div class="cart-summary-row">
+          <span>Артикули</span><span><%= current_cart.item_count %></span>
+        </div>
+        <div class="cart-summary-row cart-summary-total">
+          <span>Общо</span>
+          <span>
+            <strong><%= current_cart.total.eur_formatted %></strong>
+          </span>
+        </div>
+        <%= link_to "Продължи към поръчка", new_order_path, class: "btn btn-primary btn-block btn-lg" %>
+        <%= link_to "Продължи пазаруването", shop_path, class: "btn btn-ghost btn-block" %>
+        <%= button_to "Изпразни количката", cart_clear_path, method: :delete, class: "cart-clear-link" %>
+      </aside>
+    </div>
+  <% end %>
+</div>
