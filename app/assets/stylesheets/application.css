@@ -331,7 +331,7 @@ h1, h2, h3, h4 { color: var(--color-ink); line-height: 1.2; }
 
 /* ---------- Promo band ---------- */
 .promo-band { background: var(--color-primary); color: #fff; }
-.promo-band-inner { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 28px 24px; }
+.promo-band-inner { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 28px 24px; }
 .promo-item { display: flex; flex-direction: column; }
 .promo-item strong { font-size: 1.1rem; }
 .promo-item span { opacity: .9; font-size: .95rem; }
