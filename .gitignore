@@ -39,3 +39,7 @@
 
 # Local Speedy credentials (never commit)
 /config/speedy.yml
+
+# Local Kamal secrets (never commit)
+/.kamal/registry_password
+/.kamal/postgres_password

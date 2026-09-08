@@ -87,6 +87,7 @@ test:
 production:
   primary: &primary_production
     <<: *default
+    host: <%= ENV["DB_HOST"] %>
     database: nexus_shine_production
     username: nexus_shine
     password: <%= ENV["NEXUS_SHINE_DATABASE_PASSWORD"] %>
