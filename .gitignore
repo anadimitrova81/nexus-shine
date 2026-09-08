@@ -34,8 +34,9 @@
 /config/*.key
 
 
-# Local myPOS credentials (never commit)
+# Local myPOS credentials (never commit) — dev file and live-store input file
 /config/mypos.yml
+/config/mypos.production.yml
 
 # Local Speedy credentials (never commit)
 /config/speedy.yml

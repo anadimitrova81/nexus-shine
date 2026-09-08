@@ -30,10 +30,26 @@ module Mypos
     # The local simulator (development only) short-circuits all credentials.
     def sandbox? = LocalSandbox.enabled?
 
-    # Value precedence for real (non-sandbox) mode: Rails credentials → ENV →
-    # a plain config/mypos.yml file (easiest to edit, git-ignored).
+    # Value precedence for real (non-sandbox) mode.
+    #   production:  Rails credentials → ENV → config/mypos.yml
+    #   elsewhere:   config/mypos.yml → ENV → Rails credentials
+    # Live store keys are installed into Rails credentials for production
+    # (see `bin/rails mypos:install_credentials`); keeping the git-ignored
+    # file first in development means a dev box never signs with live keys.
     def setting(cred_key, env_key)
-      creds[cred_key].presence || ENV[env_key].presence || file_config[cred_key.to_s].presence
+      if Rails.env.production?
+        creds[cred_key].presence || ENV[env_key].presence || file_config[cred_key.to_s].presence
+      else
+        file_config[cred_key.to_s].presence || ENV[env_key].presence || creds[cred_key].presence
+      end
+    end
+
+    # myPOS's public demo store (shared sandbox credentials from their docs).
+    DEMO_SID = "000000000000010".freeze
+    DEMO_WALLET = "61938166610".freeze
+
+    def demo_store?
+      sid.to_s == DEMO_SID || wallet_number.to_s == DEMO_WALLET
     end
 
     def sid           = sandbox? ? LocalSandbox.sid           : setting(:sid, "MYPOS_SID")
