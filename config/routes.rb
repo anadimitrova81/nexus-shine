@@ -57,7 +57,7 @@ Rails.application.routes.draw do
 
     # Change the admin password (logged in) / set it via a console-issued link.
     resource  :password,        only: %i[edit update],  controller: "passwords"
-    resources :password_resets, only: %i[show update],  param: :token
+    resources :password_resets, only: %i[create show update], param: :token
 
     resources :categories
     resources :brands

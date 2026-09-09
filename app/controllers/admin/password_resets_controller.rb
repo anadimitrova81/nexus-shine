@@ -5,7 +5,22 @@ module Admin
   # password.
   class PasswordResetsController < ApplicationController
     layout "admin"
-    before_action :load_account_from_token
+    before_action :load_account_from_token, only: %i[show update]
+    rate_limit to: 3, within: 15.minutes, only: :create,
+               with: -> { redirect_to admin_login_path, alert: "Твърде много опити. Опитайте отново след 15 минути." }
+
+    # "Забравена парола?" — e-mail a fresh link to the admin address.
+    def create
+      unless Mailing::Config.configured? && Mailing::Config.admin_email_configured?
+        Rails.logger.error("[admin] password reset requested but SMTP/admin_email is not configured (config/smtp.yml)")
+        return redirect_to admin_login_path, alert: "Изпращането на имейли не е настроено. Използвайте `bin/rails admin:password_reset_link` на сървъра."
+      end
+
+      account = AdminAccount.current_or_bootstrap!
+      url = admin_password_reset_url(account.generate_token_for(:password_reset))
+      AdminMailer.password_reset(url).deliver_later
+      redirect_to admin_login_path, notice: "Изпратихме линк за нова парола на имейла на администратора. Валиден е 30 минути."
+    end
 
     def show
     end

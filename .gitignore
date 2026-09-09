@@ -47,3 +47,6 @@
 
 # Local plain-text admin password note (never commit)
 /config/admin_password.local
+
+# Local SMTP credentials (never commit)
+/config/smtp.yml

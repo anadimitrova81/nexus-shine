@@ -1,0 +1,25 @@
+# Outgoing e-mail for the shop (order e-mails, admin password reset links).
+#
+# HOW TO USE:
+#   1. Copy this file to `config/smtp.yml` (git-ignored) and fill in the values.
+#   2. Run `bin/rails smtp:check` — it sends a test e-mail to admin_email.
+#   3. Run `bin/rails smtp:install_credentials`, commit config/credentials.yml.enc
+#      and `kamal deploy` so production can send too.
+#
+# Any SMTP provider works (Gmail with an App Password, Brevo, Mailgun, Resend…).
+# NOTE: nexus-shine.com currently has no mailboxes (null MX record), so
+# `from` must be an address your provider allows and `admin_email` must be a
+# real inbox you read.
+
+address: "smtp.gmail.com"
+port: 587
+user_name: "your-login@gmail.com"
+password: "your-app-password"
+authentication: "plain"
+domain: "nexus-shine.com"
+
+# Sender shown to customers and to you.
+from: "Nexus Shine <your-login@gmail.com>"
+
+# Where the admin password-reset link is sent (must be a real inbox).
+admin_email: "your-inbox@example.com"

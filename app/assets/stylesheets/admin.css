@@ -147,5 +147,5 @@ body.admin { background: var(--color-background); }
 .admin-login-form { text-align: left; }
 .admin-auth .admin-flash { width: 100%; max-width: 380px; }
 
-.admin-login-help { margin-top: 18px; font-size: .82rem; color: var(--color-text-muted); text-align: center; }
-.admin-login-help code { font-size: .8rem; background: rgba(0,0,0,.05); padding: 2px 5px; border-radius: 4px; }
+.admin-login-forgot { display: block; margin: 16px auto 0; background: none; border: 0; padding: 0; font: inherit; font-size: .88rem; color: var(--color-text-muted); text-decoration: underline; cursor: pointer; }
+.admin-login-forgot:hover { color: var(--color-primary); }
