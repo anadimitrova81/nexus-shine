@@ -1,6 +1,7 @@
 class PaymentsController < ApplicationController
-  # myPOS posts the notification server-to-server, without a CSRF token.
-  skip_before_action :verify_authenticity_token, only: :notify
+  # myPOS posts the server-to-server notification and also returns the customer
+  # to the success/cancel URLs with a cross-origin POST — none carry a CSRF token.
+  skip_before_action :verify_authenticity_token, only: %i[notify success cancel]
   before_action :set_order
 
   # Renders the auto-submitting form that hands the customer to myPOS.

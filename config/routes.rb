@@ -34,10 +34,12 @@ Rails.application.routes.draw do
   end
 
   # myPOS card payment flow
-  get  "orders/:id/pay",             to: "payments#new",     as: :pay_order
-  get  "orders/:id/payment/success", to: "payments#success", as: :order_payment_success
-  get  "orders/:id/payment/cancel",  to: "payments#cancel",  as: :order_payment_cancel
-  post "orders/:id/payment/notify",  to: "payments#notify",  as: :order_payment_notify
+  # myPOS returns the customer to URL_OK / URL_Cancel with a POST (the local
+  # simulator uses GET), so both verbs are accepted on the return routes.
+  get   "orders/:id/pay",             to: "payments#new",     as: :pay_order
+  match "orders/:id/payment/success", to: "payments#success", as: :order_payment_success, via: %i[get post]
+  match "orders/:id/payment/cancel",  to: "payments#cancel",  as: :order_payment_cancel,  via: %i[get post]
+  post  "orders/:id/payment/notify",  to: "payments#notify",  as: :order_payment_notify
 
   # Local myPOS simulator (development only).
   if Rails.env.development?
