@@ -35,6 +35,12 @@
       <p style="margin:0 0 12px;">
         Плащане: <strong><%= payment_method_label(@order.payment_method) %></strong>
         <%= payment_status_badge(@order.payment_status) %>
+        <% if @order.card_payment? && (@order.mypos_order_ref.present? || @order.mypos_ipc_trnref.present?) %>
+          <br><small class="text-muted">
+            myPOS реф.: <%= @order.mypos_order_ref.presence || "—" %>
+            <% if @order.mypos_ipc_trnref.present? %> · транзакция: <%= @order.mypos_ipc_trnref %><% end %>
+          </small>
+        <% end %>
       </p>
       <p style="margin:0 0 12px; display:flex; gap:8px; flex-wrap:wrap;">
         <% if @order.bank_transfer? %>

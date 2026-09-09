@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_23_110754) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_09_081524) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -94,6 +94,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_110754) do
     t.bigint "invoice_number"
     t.string "invoice_vat"
     t.string "mypos_ipc_trnref"
+    t.string "mypos_order_ref"
     t.text "note"
     t.string "payment_method", default: "cod", null: false
     t.string "payment_status", default: "pending", null: false

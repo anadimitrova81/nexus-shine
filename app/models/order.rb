@@ -82,6 +82,28 @@ class Order < ApplicationRecord
 
   after_create_commit :reduce_stock_on_commit
 
+  # myPOS requires a globally unique OrderID per purchase request — the plain
+  # order id collides on retries and (on the shared demo store) with other
+  # merchants' test orders. Issue a fresh reference for every payment attempt,
+  # prefixed so it can always be traced back to this order.
+  def mypos_order_ref_prefix
+    "NS-#{id}-"
+  end
+
+  def issue_mypos_order_ref!
+    ref = "#{mypos_order_ref_prefix}#{SecureRandom.alphanumeric(6).upcase}"
+    update_column(:mypos_order_ref, ref)
+    ref
+  end
+
+  # Accept the current reference, any earlier attempt for this order (a customer
+  # may pay from an older tab), or the legacy bare id for orders created before
+  # references existed.
+  def matches_mypos_order_ref?(value)
+    value = value.to_s
+    value == mypos_order_ref.to_s || value.start_with?(mypos_order_ref_prefix) || value == id.to_s
+  end
+
   def mark_paid!(trnref = nil)
     update!(payment_status: "paid", mypos_ipc_trnref: trnref, status: status == "pending" ? "confirmed" : status)
     reduce_stock!

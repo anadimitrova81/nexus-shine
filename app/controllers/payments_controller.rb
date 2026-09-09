@@ -7,6 +7,7 @@ class PaymentsController < ApplicationController
   def new
     return redirect_to order_path(@order) unless payable?
 
+    @order.issue_mypos_order_ref!
     @purchase = Mypos::Purchase.new(@order, **callback_urls)
     render layout: false
   end
@@ -27,11 +28,11 @@ class PaymentsController < ApplicationController
   # trusting it, then mark the order paid.
   def notify
     notification = Mypos::Notification.new(request.request_parameters)
-    if notification.valid_signature? && notification.order_id.to_s == @order.id.to_s
+    if notification.valid_signature? && @order.matches_mypos_order_ref?(notification.order_id)
       @order.mark_paid!(notification.trnref)
       render plain: "OK"
     else
-      Rails.logger.warn("[mypos] rejected notify for order #{@order.id}")
+      Rails.logger.warn("[mypos] rejected notify for order #{@order.id} (OrderID=#{notification.order_id.inspect}, signature_valid=#{notification.valid_signature?})")
       head :bad_request
     end
   end

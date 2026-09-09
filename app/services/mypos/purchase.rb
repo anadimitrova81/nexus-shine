@@ -38,7 +38,7 @@ module Mypos
         "Source"       => Config.source,
         "Currency"     => Config.currency,
         "Amount"       => money(@order.grand_total_cents),
-        "OrderID"      => @order.id.to_s,
+        "OrderID"      => (@order.mypos_order_ref.presence || @order.issue_mypos_order_ref!),
         "URL_OK"       => @url_ok,
         "URL_Cancel"   => @url_cancel,
         "URL_Notify"   => @url_notify,
