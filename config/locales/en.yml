@@ -37,3 +37,15 @@ en:
         invoice_mol: "МОЛ"
         invoice_address: "Адрес по регистрация"
         invoice_vat: "ДДС №"
+      admin_account:
+        password: "Паролата"
+        password_confirmation: "Потвърждението"
+    errors:
+      models:
+        admin_account:
+          attributes:
+            password:
+              too_short: "трябва да е поне %{count} знака"
+              blank: "не може да е празна"
+            password_confirmation:
+              confirmation: "не съвпада с паролата"

@@ -38,12 +38,12 @@
 /config/mypos.yml
 /config/mypos.production.yml
 
-# Plain-text input for `bin/rails admin:set_password` (never commit)
-/config/admin_password.local
-
 # Local Speedy credentials (never commit)
 /config/speedy.yml
 
 # Local Kamal secrets (never commit)
 /.kamal/registry_password
 /.kamal/postgres_password
+
+# Local plain-text admin password note (never commit)
+/config/admin_password.local

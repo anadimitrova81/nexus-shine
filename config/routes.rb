@@ -55,6 +55,10 @@ Rails.application.routes.draw do
     post   "login",  to: "sessions#create"
     delete "logout", to: "sessions#destroy", as: :logout
 
+    # Change the admin password (logged in) / set it via a console-issued link.
+    resource  :password,        only: %i[edit update],  controller: "passwords"
+    resources :password_resets, only: %i[show update],  param: :token
+
     resources :categories
     resources :brands
     resources :products

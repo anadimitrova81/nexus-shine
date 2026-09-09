@@ -1,0 +1,17 @@
+<% content_for :title, "Нова парола" %>
+<div class="admin-login-card">
+  <%= image_tag "nexus-shine-logo.png", alt: "Nexus Shine", class: "admin-login-logo" %>
+  <h1>Нова парола за администрацията</h1>
+  <p>Изберете парола с минимум <%= AdminAccount::MIN_PASSWORD_LENGTH %> знака.</p>
+  <%= form_with url: admin_password_reset_path(params[:token]), method: :patch, class: "admin-login-form", data: { turbo: false } do %>
+    <div class="field">
+      <%= label_tag :password, "Нова парола" %>
+      <%= password_field_tag :password, nil, required: true, minlength: AdminAccount::MIN_PASSWORD_LENGTH, autocomplete: "new-password", autofocus: true %>
+    </div>
+    <div class="field">
+      <%= label_tag :password_confirmation, "Повторете паролата" %>
+      <%= password_field_tag :password_confirmation, nil, required: true, minlength: AdminAccount::MIN_PASSWORD_LENGTH, autocomplete: "new-password" %>
+    </div>
+    <%= submit_tag "Задай паролата", class: "btn btn-primary btn-block btn-lg" %>
+  <% end %>
+</div>

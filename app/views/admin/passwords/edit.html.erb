@@ -1,0 +1,26 @@
+<% content_for :title, "Смяна на парола" %>
+<div class="admin-head">
+  <h1>Смяна на парола</h1>
+</div>
+
+<%= form_with url: admin_password_path, method: :patch, class: "admin-form", data: { turbo: false } do %>
+  <div class="field">
+    <%= label_tag :current_password, "Текуща парола" %>
+    <%= password_field_tag :current_password, nil, required: true, autocomplete: "current-password", autofocus: true %>
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <%= label_tag :password, "Нова парола" %>
+      <%= password_field_tag :password, nil, required: true, minlength: AdminAccount::MIN_PASSWORD_LENGTH, autocomplete: "new-password" %>
+      <p class="field-hint">Минимум <%= AdminAccount::MIN_PASSWORD_LENGTH %> знака.</p>
+    </div>
+    <div class="field">
+      <%= label_tag :password_confirmation, "Повторете новата парола" %>
+      <%= password_field_tag :password_confirmation, nil, required: true, minlength: AdminAccount::MIN_PASSWORD_LENGTH, autocomplete: "new-password" %>
+    </div>
+  </div>
+  <div class="form-actions">
+    <%= submit_tag "Смени паролата", class: "btn btn-primary" %>
+    <%= link_to "Отказ", admin_root_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

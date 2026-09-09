@@ -1,6 +1,8 @@
 module Admin
-  # Single-password admin gate. The password comes from Rails credentials
-  # (admin_password) or the ADMIN_PASSWORD env var, with a dev-only fallback.
+  # Single-password admin gate. The password lives in AdminAccount (changeable
+  # from Admin → Парола, resettable via `bin/rails admin:password_reset_link`).
+  # Until that row exists, Rails credentials (admin_password) or ADMIN_PASSWORD
+  # are accepted, with a development-only default.
   class SessionsController < ApplicationController
     layout "admin"
 
@@ -26,9 +28,13 @@ module Admin
     private
 
     def valid_password?(input)
+      if (account = AdminAccount.current)
+        return account.authenticate(input.to_s).present?
+      end
+
       password = admin_password
       if password.blank?
-        Rails.logger.error("[admin] no admin password configured — set it with `bin/rails admin:set_password`")
+        Rails.logger.error("[admin] no admin password configured — run `bin/rails admin:password_reset_link`")
         return false
       end
       ActiveSupport::SecurityUtils.secure_compare(

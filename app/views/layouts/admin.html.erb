@@ -28,6 +28,7 @@
             <%= link_to "Марки", admin_brands_path, class: admin_nav_class("brands") %>
           </nav>
           <div class="admin-sidebar-foot">
+            <%= link_to "Парола", edit_admin_password_path, class: admin_nav_class("passwords") %>
             <%= link_to "↗ Виж сайта", root_path, class: "admin-nav-link" %>
             <%= button_to "Изход", admin_logout_path, method: :delete, class: "admin-logout" %>
           </div>
