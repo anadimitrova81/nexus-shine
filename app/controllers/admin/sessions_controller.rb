@@ -26,16 +26,24 @@ module Admin
     private
 
     def valid_password?(input)
+      password = admin_password
+      if password.blank?
+        Rails.logger.error("[admin] no admin password configured — set it with `bin/rails admin:set_password`")
+        return false
+      end
       ActiveSupport::SecurityUtils.secure_compare(
         Digest::SHA256.hexdigest(input.to_s),
-        Digest::SHA256.hexdigest(admin_password),
+        Digest::SHA256.hexdigest(password),
       )
     end
 
+    # Production must have an explicit password; the "shine-admin" fallback is
+    # for development/test only so a misconfigured live site denies all logins
+    # instead of accepting a well-known default.
     def admin_password
       Rails.application.credentials.admin_password.presence ||
         ENV["ADMIN_PASSWORD"].presence ||
-        "shine-admin"
+        (Rails.env.local? ? "shine-admin" : nil)
     end
   end
 end
