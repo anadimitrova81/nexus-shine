@@ -182,8 +182,13 @@
       <% end %>
     </ul>
     <div class="cart-summary-row">
-      <span>Продукти</span><span><%= current_cart.total.eur_formatted %></span>
+      <span>Продукти</span><span><%= current_cart.subtotal.eur_formatted %></span>
     </div>
+    <% if current_cart.discount? %>
+      <div class="cart-summary-row cart-summary-discount">
+        <span><%= Discount.label %></span><span>−<%= current_cart.discount.eur_formatted %></span>
+      </div>
+    <% end %>
     <% if shipping_available? %>
       <div class="cart-summary-row">
         <span>Доставка (Speedy)</span><span id="ship-amount">—</span>

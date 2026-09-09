@@ -160,6 +160,11 @@ module Invoices
          format("%.2f", item.unit_price_cents / 100.0),
          format("%.2f €", item.quantity * item.unit_price_cents / 100.0) ]
       end
+      if @order.discount?
+        rows << [ (rows.size + 1).to_s, "#{Discount.label} (поръчка над #{Discount.threshold.eur_formatted})", "1.00 бр.",
+                 format("%.2f", -@order.discount_cents / 100.0),
+                 format("%.2f €", -@order.discount_cents / 100.0) ]
+      end
       if @order.shipping_cents.to_i.positive?
         rows << [ (rows.size + 1).to_s, shipping_line_label, "1.00 бр.",
                  format("%.2f", @order.shipping_cents / 100.0),

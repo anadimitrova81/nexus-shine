@@ -57,14 +57,36 @@ class Cart
     products_by_id.keys.sum { |id| store[id] }
   end
 
-  def total_cents
+  # Product subtotal before any discount.
+  def subtotal_cents
     products_by_id.sum { |id, product| product.price_cents * store[id] }
+  end
+
+  def discount_cents
+    Discount.cents_for(subtotal_cents)
+  end
+
+  def discount?
+    discount_cents.positive?
+  end
+
+  # What the customer pays for the products (subtotal minus discount).
+  def total_cents
+    subtotal_cents - discount_cents
   end
 
   # Total cart weight in kilograms, for Speedy shipping calculation.
   def total_weight_kg
     grams = products_by_id.sum { |id, product| product.weight_grams.to_i * store[id] }
     (grams / 1000.0).round(3)
+  end
+
+  def subtotal
+    Money.new(subtotal_cents)
+  end
+
+  def discount
+    Money.new(discount_cents)
   end
 
   def total

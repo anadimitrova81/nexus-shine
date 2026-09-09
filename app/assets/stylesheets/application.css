@@ -327,6 +327,9 @@ h1, h2, h3, h4 { color: var(--color-ink); line-height: 1.2; }
   .shop-sidebar { position: static; }
 }
 
+.cart-summary-discount { color: #1f8f4e; font-weight: 600; }
+.cart-discount-hint { font-size: .85rem; color: var(--color-text-muted); margin: 4px 0 10px; }
+
 .empty-state { text-align: center; color: var(--color-text-muted); padding: 40px 0; }
 
 /* ---------- Promo band ---------- */

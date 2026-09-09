@@ -50,9 +50,17 @@ class Order < ApplicationRecord
     invoice_number.present?
   end
 
-  # total_cents is the product subtotal; shipping is separate.
+  # total_cents is the product subtotal; discount and shipping are separate.
   def subtotal
     Money.new(total_cents)
+  end
+
+  def discount
+    Money.new(discount_cents)
+  end
+
+  def discount?
+    discount_cents.to_i.positive?
   end
 
   def shipping
@@ -60,7 +68,7 @@ class Order < ApplicationRecord
   end
 
   def grand_total_cents
-    total_cents.to_i + shipping_cents.to_i
+    total_cents.to_i - discount_cents.to_i + shipping_cents.to_i
   end
 
   def grand_total
@@ -134,7 +142,8 @@ class Order < ApplicationRecord
         quantity: quantity,
       )
     end
-    self.total_cents = cart.total_cents
+    self.total_cents = cart.subtotal_cents
+    self.discount_cents = cart.discount_cents
   end
 
   private

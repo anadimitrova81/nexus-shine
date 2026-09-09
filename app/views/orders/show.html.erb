@@ -38,6 +38,12 @@
           <td>Продукти</td>
           <td class="right"><%= @order.subtotal.eur_formatted %></td>
         </tr>
+        <% if @order.discount? %>
+          <tr>
+            <td><%= Discount.label %></td>
+            <td class="right">−<%= @order.discount.eur_formatted %></td>
+          </tr>
+        <% end %>
         <% if @order.shipping_cents.to_i.positive? %>
           <tr>
             <td>Доставка (Speedy)</td>

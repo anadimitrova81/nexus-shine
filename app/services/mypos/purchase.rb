@@ -56,9 +56,13 @@ module Mypos
         "customeraddress"    => @order.address.to_s,
       }
 
-      # Product lines, plus a shipping line so the item amounts sum to Amount.
+      # Product lines, plus discount and shipping lines so the item amounts sum
+      # to Amount.
       lines = @order.order_items.map do |item|
         { name: item.product_name, qty: item.quantity, price_cents: item.unit_price_cents }
+      end
+      if @order.discount?
+        lines << { name: Discount.label, qty: 1, price_cents: -@order.discount_cents }
       end
       if @order.shipping_cents.to_i.positive?
         lines << { name: "Доставка (Speedy)", qty: 1, price_cents: @order.shipping_cents }

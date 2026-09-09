@@ -47,6 +47,16 @@
         <div class="cart-summary-row">
           <span>Артикули</span><span><%= current_cart.item_count %></span>
         </div>
+        <div class="cart-summary-row">
+          <span>Продукти</span><span><%= current_cart.subtotal.eur_formatted %></span>
+        </div>
+        <% if current_cart.discount? %>
+          <div class="cart-summary-row cart-summary-discount">
+            <span><%= Discount.label %></span><span>−<%= current_cart.discount.eur_formatted %></span>
+          </div>
+        <% else %>
+          <p class="cart-discount-hint">Добавете още <%= Money.new(Discount.remaining_cents(current_cart.subtotal_cents)).eur_formatted %> за <%= Discount::PERCENT %>% отстъпка (при поръчка над <%= Discount.threshold.eur_formatted %>).</p>
+        <% end %>
         <div class="cart-summary-row cart-summary-total">
           <span>Общо</span>
           <span>
