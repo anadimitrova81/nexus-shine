@@ -25,11 +25,15 @@ module Mailing
     def setting(key)
       key = key.to_s
       env_key = "SMTP_#{key.upcase}"
-      if Rails.env.production?
-        creds[key.to_sym].presence || ENV[env_key].presence || file_config[key].presence
-      else
-        file_config[key].presence || ENV[env_key].presence || creds[key.to_sym].presence
-      end
+      sources = [creds[key.to_sym], ENV[env_key], file_config[key]]
+      sources.reverse! unless Rails.env.production?
+      sources.map { |v| real(v) }.compact.first
+    end
+
+    # Ignore blanks and the "your-…" placeholders from config/smtp.example.yml.
+    def real(value)
+      v = value.to_s.strip
+      v.presence unless v.include?("your-")
     end
 
     def address        = setting(:address)

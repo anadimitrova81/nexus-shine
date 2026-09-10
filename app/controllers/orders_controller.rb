@@ -17,9 +17,10 @@ class OrdersController < ApplicationController
 
     if @order.save
       current_cart.clear
-      OrderMailer.bank_instructions(@order).deliver_later if @order.bank_transfer?
       # Bank orders get an invoice manually in the admin once the transfer arrives.
       @order.ensure_invoice_number! if @order.wants_invoice? && !@order.bank_transfer?
+      # Card orders are confirmed by e-mail once myPOS reports the payment (PaymentsController#notify).
+      OrderMailer.confirmation(@order).deliver_later unless @order.card_payment?
       if @order.card_payment?
         redirect_to pay_order_path(@order)
       else

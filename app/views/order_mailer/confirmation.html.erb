@@ -1,0 +1,71 @@
+<% td = "padding:6px 10px;border-bottom:1px solid #e3e8ec;" %>
+<p>Здравейте, <%= @order.customer_name %>,</p>
+
+<p>Благодарим за поръчка <strong>№<%= @order.id %></strong> в Nexus Shine!
+<% if @order.card_payment? %>
+  Плащането с карта е получено<%= " (транзакция #{@order.mypos_ipc_trnref})" if @order.mypos_ipc_trnref.present? %>.
+<% elsif @order.bank_transfer? %>
+  Избрахте плащане по банков път — данните за превода са по-долу, а проформа фактурата е приложена.
+<% else %>
+  Избрахте плащане при доставка (наложен платеж) — ще платите на куриера при получаване.
+<% end %>
+</p>
+
+<table cellpadding="0" cellspacing="0" style="border-collapse:collapse;min-width:360px;">
+  <thead>
+    <tr>
+      <th align="left" style="<%= td %>background:#f3f6f8;">Артикул</th>
+      <th align="right" style="<%= td %>background:#f3f6f8;">Бр.</th>
+      <th align="right" style="<%= td %>background:#f3f6f8;">Сума</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @order.order_items.each do |item| %>
+      <tr>
+        <td style="<%= td %>"><%= item.product_name %></td>
+        <td align="right" style="<%= td %>"><%= item.quantity %></td>
+        <td align="right" style="<%= td %>"><%= item.subtotal.eur_formatted %></td>
+      </tr>
+    <% end %>
+    <tr><td colspan="2" align="right" style="<%= td %>">Продукти</td><td align="right" style="<%= td %>"><%= @order.subtotal.eur_formatted %></td></tr>
+    <% if @order.discount? %>
+      <tr><td colspan="2" align="right" style="<%= td %>color:#1f8f4e;"><%= Discount.label %></td><td align="right" style="<%= td %>color:#1f8f4e;">−<%= @order.discount.eur_formatted %></td></tr>
+    <% end %>
+    <% if @order.shipping_cents.to_i.positive? %>
+      <tr><td colspan="2" align="right" style="<%= td %>">Доставка (Speedy)</td><td align="right" style="<%= td %>"><%= @order.shipping.eur_formatted %></td></tr>
+    <% end %>
+    <tr><td colspan="2" align="right" style="<%= td %>"><strong>Общо</strong></td><td align="right" style="<%= td %>"><strong><%= @order.grand_total.eur_formatted %></strong></td></tr>
+  </tbody>
+</table>
+
+<h3 style="margin:22px 0 6px;">Доставка</h3>
+<p style="margin:0;">
+  <% if @order.shipping_method == "office" %>До офис на Speedy: <strong><%= @order.shipping_label.presence || @order.shipping_city %></strong><br>
+  <% elsif @order.shipping_method == "address" %>Speedy до адрес<br><% end %>
+  <%= @order.customer_name %>, <%= @order.phone %><br>
+  <%= @order.address %>, <%= @order.city %> <%= @order.postal_code %>
+</p>
+
+<% if @order.wants_invoice? %>
+  <h3 style="margin:22px 0 6px;">Фактура</h3>
+  <p style="margin:0;">
+    <%= @order.invoice_company %>, ЕИК <%= @order.invoice_eik %><%= ", ДДС № #{@order.invoice_vat}" if @order.invoice_vat.present? %><br>
+    <% if @order.invoiced? %>Фактура №<%= format("%010d", @order.invoice_number) %> е приложена.<% else %>Фактурата ще получите след потвърждение на плащането.<% end %>
+  </p>
+<% end %>
+
+<% if @bank %>
+  <h3 style="margin:22px 0 6px;">Банкови детайли за превода</h3>
+  <table cellpadding="6" style="border-collapse:collapse;border:1px solid #999;">
+    <tr><td style="border:1px solid #999;">Банка:</td><td style="border:1px solid #999;"><strong><%= @bank[:name] %></strong></td></tr>
+    <tr><td style="border:1px solid #999;">IBAN:</td><td style="border:1px solid #999;"><strong><%= @bank[:iban] %></strong></td></tr>
+    <tr><td style="border:1px solid #999;">BIC/SWIFT:</td><td style="border:1px solid #999;"><strong><%= @bank[:bic] %></strong></td></tr>
+    <tr><td style="border:1px solid #999;">Сума:</td><td style="border:1px solid #999;"><strong><%= @order.grand_total.eur_formatted %></strong></td></tr>
+    <tr><td style="border:1px solid #999;">Основание:</td><td style="border:1px solid #999;"><strong>Поръчка #<%= @order.id %></strong></td></tr>
+  </table>
+  <p>Ще потвърдим и изпратим поръчката веднага след получаване на превода.</p>
+<% else %>
+  <p>Ще се свържем с вас на <%= @order.phone %>, ако е нужно уточнение, и ще ви уведомим при изпращане.</p>
+<% end %>
+
+<p>Поздрави,<br>Екипът на Nexus Shine</p>

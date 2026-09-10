@@ -30,7 +30,9 @@ class PaymentsController < ApplicationController
   def notify
     notification = Mypos::Notification.new(request.request_parameters)
     if notification.valid_signature? && @order.matches_mypos_order_ref?(notification.order_id)
+      first_confirmation = !@order.paid?
       @order.mark_paid!(notification.trnref)
+      OrderMailer.confirmation(@order).deliver_later if first_confirmation
       render plain: "OK"
     else
       Rails.logger.warn("[mypos] rejected notify for order #{@order.id} (OrderID=#{notification.order_id.inspect}, signature_valid=#{notification.valid_signature?})")
