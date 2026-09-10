@@ -55,8 +55,20 @@ module Mypos
     def sid           = sandbox? ? LocalSandbox.sid           : setting(:sid, "MYPOS_SID")
     def wallet_number = sandbox? ? LocalSandbox.wallet_number : setting(:wallet_number, "MYPOS_WALLET_NUMBER")
     def key_index     = sandbox? ? LocalSandbox.key_index     : (setting(:key_index, "MYPOS_KEY_INDEX") || 1).to_s
-    def private_key   = sandbox? ? LocalSandbox.private_key   : setting(:private_key, "MYPOS_PRIVATE_KEY")
-    def public_cert   = sandbox? ? LocalSandbox.public_cert   : setting(:public_cert, "MYPOS_PUBLIC_CERT")
+    def private_key   = normalize_pem(sandbox? ? LocalSandbox.private_key : setting(:private_key, "MYPOS_PRIVATE_KEY"))
+    def public_cert   = normalize_pem(sandbox? ? LocalSandbox.public_cert : setting(:public_cert, "MYPOS_PUBLIC_CERT"))
+
+    # Keys pasted from the myPOS "configuration package" or an editor often end
+    # up with the base64 body on a single line (or with literal "\n"), which
+    # OpenSSL rejects. Re-wrap every PEM block to 64-column lines.
+    def normalize_pem(pem)
+      return pem if pem.blank?
+      text = pem.to_s.gsub("\\n", "\n").gsub("\\/", "/").strip
+      text.gsub(/(-----BEGIN [A-Z ]+-----)(.*?)(-----END [A-Z ]+-----)/m) do
+        header, body, footer = $1, $2, $3
+        "#{header}\n#{body.gsub(/\s+/, "").scan(/.{1,64}/).join("\n")}\n#{footer}"
+      end + "\n"
+    end
     def ipc_url       = sandbox? ? LocalSandbox.checkout_url  : (setting(:ipc_url, "MYPOS_IPC_URL") || DEFAULT_TEST_URL)
     def source        = setting(:source, "MYPOS_SOURCE")     || "SDK_Ruby"
     def language      = setting(:language, "MYPOS_LANGUAGE") || "BG"
